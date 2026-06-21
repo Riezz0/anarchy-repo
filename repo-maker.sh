@@ -12,6 +12,11 @@ rm -f anarchy-repo.db anarchy-repo.files anarchy-repo.db.tar.zst anarchy-repo.fi
 # - Build The Repo Packages
 repo-add anarchy-repo.db.tar.zst *.pkg.tar.zst
 
+# - Remove Symlinks and Rename to Actual Files
+rm -f anarchy-repo.db anarchy-repo.files
+mv anarchy-repo.db.tar.zst anarchy-repo.db
+mv anarchy-repo.files.tar.zst anarchy-repo.files
+
 # - Push The Repo To Github
 cd "${REPO_DIR}"
 read -rp "Commit message: " msg
