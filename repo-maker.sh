@@ -1,30 +1,19 @@
 #!/bin/bash
+set -euo pipefail
+
+REPO_DIR="/home/$USER/git/anarchy-repo"
 
 # - Change Directory
-cd /home/$USER/git/repo/x86_64
+cd "${REPO_DIR}/x86_64"
 
 # - Remove Existing Database
-#
-rm repo.db
-rm repo.files
+rm -f anarchy-repo.db anarchy-repo.files anarchy-repo.db.tar.zst anarchy-repo.files.tar.zst
 
 # - Build The Repo Packages
-#
-repo-add repo.db.tar.zst *.pkg.tar.zst
-
-# - Remove Symlinks 
-#
-rm repo.db 
-rm repo.files
-
-# - Rename Database files
-#
-mv repo.db.tar.zst repo.db 
-mv repo.files.tar.zst repo.files
+repo-add anarchy-repo.db.tar.zst *.pkg.tar.zst
 
 # - Push The Repo To Github
-#
-cd /home/$USER/git/repo/
+cd "${REPO_DIR}"
 read -rp "Commit message: " msg
 git add .
 git commit -m "$msg"
