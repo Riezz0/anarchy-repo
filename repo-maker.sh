@@ -19,9 +19,10 @@ mv anarchy-repo.files.tar.zst anarchy-repo.files
 
 # - Push The Repo To Github
 cd "${REPO_DIR}"
-read -rp "Commit message: " msg
+#read -rp "Commit message: " msg
 git add .
-git commit -m "$msg"
+git commit --allow-empty-message -m ""
+#git commit -m "$msg"
 git push
 
 echo "##################################"
