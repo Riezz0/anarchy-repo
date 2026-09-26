@@ -26,6 +26,16 @@ CURRENT_LIST=()
 CUSTOM_LIST=()
 FAILED_LIST=()
 
+# Packages required by Anarchy-Installer's offline pacstrap step.  pacman -Sw
+# resolves and downloads their complete dependency closure into the local
+# repository, so the installer never needs to contact an Arch mirror.
+INSTALLER_PACKAGES=(
+    base linux-zen linux-zen-headers linux-firmware btrfs-progs grub sddm
+    networkmanager hyprland uwsm pipewire pipewire-audio pipewire-alsa
+    pipewire-pulse wireplumber git stow zsh dkms base-devel sudo rsync curl
+    amd-ucode mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon efibootmgr
+)
+
 log_info()  { echo -e "${CYAN}  ➜ $*${NC}"; }
 log_ok()    { echo -e "${GREEN}  ✓ $*${NC}"; }
 log_warn()  { echo -e "${YELLOW}  ⚠ $*${NC}"; }
@@ -45,6 +55,27 @@ if [ ! -d "$PKG_DIR" ]; then
 fi
 
 mkdir -p "$BUILD_DIR"
+
+download_installer_closure() {
+    local cache_dir="$BUILD_DIR/installer-cache"
+    mkdir -p "$cache_dir"
+
+    log_info "Downloading installer packages and all dependencies..."
+    if ! pacman -Sw --noconfirm --cachedir "$cache_dir" \
+        "${INSTALLER_PACKAGES[@]}"; then
+        log_err "Could not download the installer dependency closure"
+        return 1
+    fi
+
+    local package
+    shopt -s nullglob
+    for package in "$cache_dir"/*.pkg.tar.*; do
+        cp -f -- "$package" "$PKG_DIR/"
+    done
+    shopt -u nullglob
+}
+
+download_installer_closure
 
 echo -e "\n${CYAN}════════════════════════════════════════════════════════════${NC}"
 echo -e "${CYAN}  Anarchy Repo Update Checker${NC}"
